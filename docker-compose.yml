@@ -4,15 +4,36 @@ services:
     container_name: 'api'
     image: "${API_IMAGE_PATH}"
     ports:
-        - '8080:8080'
+        - 80:8080
+        - 443:443
+    environment:
+      - CORS_ALLOWED_ORIGIN=${CORS_ALLOWED_ORIGIN}
+      - TLS_ENABLED=${TLS_ENABLED}
+      - TLS_DOMAIN=${TLS_DOMAIN}
     depends_on:
       - 'mongodb'
+    volumes:
+      - certbot-webroot-hlsrc:/root/public/.well-known
+      - certbot-letsencrypt:/etc/letsencrypt
   mongodb:
+    container_name: 'mongodb'
     image: mongo
     ports:
       - 27017:27017
     volumes:
       - mongodata:/data/db
 
+  certbot:
+    build: ./certbot
+    container_name: certbot
+    restart: always
+    environment:
+      - TLS_DOMAIN=${TLS_DOMAIN}
+    volumes:
+      - certbot-webroot-hlsrc:/webroots/${TLS_DOMAIN}/.well-known
+      - certbot-letsencrypt:/etc/letsencrypt
+
 volumes:
   mongodata:
+  certbot-webroot-hlsrc:
+  certbot-letsencrypt:
