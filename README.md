@@ -15,3 +15,26 @@ This repository contains docker-compose for running application https://github.c
 7. Check ran containers: ```docker ps``` or ```docker container ls```. You should have 2 containers: api and mongo.
 
 Now you can open in browser: ```http://0.0.0.0:8080/```
+
+### TLS
+Prepare your enviroment variables at ```.env```
+
+For the first time your need to join to certbot container ```docker exec -it certbot bash```
+
+Next, execute command (don't forget for set you domain):
+
+```bash
+/scripts/certbot-auto certonly --webroot -w /webroots/your-domain.tld -d your-domain.tld
+```
+
+Check for existing certificate files:
+```bash
+ls /etc/letsencrypt/live/your-domain.tld
+```
+
+Also your can check availability from api application:
+```bash
+docker exec -it api ls /etc/letsencrypt/live/your-domain.tld
+```
+
+Dont forget to change enviroment variable ```CORS_ALLOWED_ORIGIN``` and restart docker containers (```docker-composer up -d```).
